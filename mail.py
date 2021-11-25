@@ -2,13 +2,15 @@ from flask import Flask, render_template, url_for, request, Response
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import os
 
 
 class Mail:
     port = 465
     smtp_server_domain_name = 'smtp.gmail.com'
     sender_mail = 'dp217py@gmail.com'
-    password = '51729pa$$'
+    with open("configs", "r") as p:     
+        password = p.read()
 
     def __init__(self, data):
         self.email = data['mail']
@@ -26,11 +28,9 @@ class Mail:
             mail['From'] = self.sender_mail
             mail['To'] = self.email
 
-            # html_content = MIMEText(html_template, 'html')
             text_content = MIMEText(self.text_template, 'plain')
 
             mail.attach(text_content)
-            # mail.attach(html_content)
 
             service.sendmail(self.sender_mail, self.email, mail.as_string())
             report += f"Mail to {self.email} was sent.\n"
