@@ -1,4 +1,3 @@
-from flask import Flask, render_template, url_for, request, Response
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -9,8 +8,7 @@ class Mail:
     port = 465
     smtp_server_domain_name = 'smtp.gmail.com'
     sender_mail = 'dp217py@gmail.com'
-    with open("configs", "r") as p:     
-        password = p.read()
+    password = os.environ.get('PASS_MAIL')
 
     def __init__(self, data):
         self.email = data['mail']
@@ -28,17 +26,16 @@ class Mail:
             mail['From'] = self.sender_mail
             mail['To'] = self.email
 
-            text_content = MIMEText(self.text_template, 'plain')
+            text_content = MIMEText(self.text_template, 'html')
 
             mail.attach(text_content)
 
             service.sendmail(self.sender_mail, self.email, mail.as_string())
             report += f"Mail to {self.email} was sent.\n"
-            report += "Mails was sent!"
             return report
 
-        except Exception as _ex:
-            return f'{_ex}\nSend mail error!'
+        except smtplib.SMTPException as error:
+            return f'{error}\nSend mail error!'
 
         finally:
             service.quit()
