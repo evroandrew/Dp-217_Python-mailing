@@ -3,14 +3,12 @@ from Schema import UserSchema
 from mail import Mail
 import os
 
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 
 
 @app.route('/')
 def main():
-
     return '@Hello Flask_mailing@'
 
 
@@ -27,4 +25,4 @@ def mailing():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", port=os.environ.get('PORT', 5000), debug=True, use_reloader=False)
