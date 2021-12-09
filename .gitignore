@@ -2,6 +2,9 @@
 __pycache__/
 *.py[cod]
 *$py.class
+configs
+docker_commands
+error.log
 
 # C extensions
 *.so
