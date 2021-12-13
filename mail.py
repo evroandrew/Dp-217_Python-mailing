@@ -8,6 +8,7 @@ class Mail:
     port = 465
     smtp_server_domain_name = 'smtp.gmail.com'
     sender_mail = 'dp217py@gmail.com'
+    sender_name = '"Enrollment_assistant"'
     password = os.environ.get('PASS_MAIL')
 
     def __init__(self, data):
@@ -23,7 +24,7 @@ class Mail:
 
             mail = MIMEMultipart('alternative')
             mail['Subject'] = self.subject
-            mail['From'] = self.sender_mail
+            mail['From'] = self.sender_name
             mail['To'] = self.email
 
             text_content = MIMEText(self.text_template, 'html')
