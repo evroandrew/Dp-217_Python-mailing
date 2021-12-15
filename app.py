@@ -43,7 +43,7 @@ app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
 if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
     try:
         schedule = BackgroundScheduler(daemon=True, job_defaults={'max_instances': 6000}, timezone=utc)
-        schedule.add_job(consumer, 'interval', minutes=2)
+        schedule.add_job(consumer, 'interval', seconds=1)
         schedule.start()
     except Exception as er:
         logger.error(f"APScheduler_Error: {er}")
@@ -69,4 +69,4 @@ def mailing():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=os.environ.get('PORT', 5000), debug=os.environ.get('DEBUG', True), use_reloader=False)
+    app.run(host="0.0.0.0", port=os.environ.get('PORT', 5000), debug=os.environ.get('DEBUG', False), use_reloader=False)
