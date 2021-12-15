@@ -14,6 +14,7 @@ from logs import logger
 
 
 def consumer():
+    logger.info('started')
     try:
         consumer = KafkaConsumer(
             'send_mail',
@@ -27,9 +28,9 @@ def consumer():
         for item in record.get("items", []):
             data = UserSchema().dump(item)
             if data['mail'] and data['subject'] and data['text']:
-                mail = Mail(data)
-                result = mail.send_mail()
+                result = mail_sender.send_mail(data)
                 time.sleep(1)
+                logger.error(result)
                 return Response(status=200)
             else:
                 logger.error('Your mail-data is invalid!')
@@ -38,12 +39,12 @@ def consumer():
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
-
+mail_sender = Mail()
 
 if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
     try:
         schedule = BackgroundScheduler(daemon=True, job_defaults={'max_instances': 6000}, timezone=utc)
-        schedule.add_job(consumer, 'interval', seconds=1)
+        schedule.add_job(consumer, 'interval', seconds=10)
         schedule.start()
     except Exception as er:
         logger.error(f"APScheduler_Error: {er}")
@@ -62,8 +63,7 @@ def mailing():
         logger.error("Mail-data:", err)
         return Response(err, status=400)
     else:
-        mail = Mail(request_data)
-        result = mail.send_mail()
+        result = mail_sender.send_mail(request_data)
         logger.info(f"Sending mail result: {result}")
         return Response(result, status=200)
 
