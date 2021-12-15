@@ -44,7 +44,7 @@ mail_sender = Mail()
 if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
     try:
         schedule = BackgroundScheduler(daemon=True, job_defaults={'max_instances': 6000}, timezone=utc)
-        schedule.add_job(consumer, 'interval', seconds=30)
+        schedule.add_job(consumer, 'interval', seconds=os.environ.get("SCHEDULE_INTERVAL", 30))
         schedule.start()
     except Exception as er:
         logger.error(f"APScheduler_Error: {er}")
