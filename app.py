@@ -12,29 +12,38 @@ from mail import Mail
 from schema import UserSchema
 from logs import logger
 
+STARTED = False
+
 
 def consumer():
+    global STARTED
     logger.info('started')
-    try:
-        consumer = KafkaConsumer(
-            'send_mail',
-            bootstrap_servers=os.environ.get("BOOTSTRAP_SERVERS"),
-        )
-    except KafkaError as exc:
-        logger.error(f"Kafka consumer - Exception during connecting to broker - {exc}")
-        return Response(status=500)
-    for message in consumer:
-        record = json.loads(message.value)
-        for item in record.get("items", []):
-            data = UserSchema().dump(item)
-            if data['mail'] and data['subject'] and data['text']:
-                result = mail_sender.send_mail(data)
-                time.sleep(1)
-                logger.error(result)
-                return Response(status=200)
-            else:
-                logger.error('Your mail-data is invalid!')
-                return Response(status=400)
+    if not STARTED:
+        STARTED = True
+        try:
+            consumer = KafkaConsumer(
+                'send_mail',
+                bootstrap_servers=os.environ.get("BOOTSTRAP_SERVERS"),
+            )
+        except KafkaError as exc:
+            logger.error(f"Kafka consumer - Exception during connecting to broker - {exc}")
+            STARTED = False
+            return Response(status=500)
+        for message in consumer:
+            record = json.loads(message.value)
+            for item in record.get("items", []):
+                data = UserSchema().dump(item)
+                if data['mail'] and data['subject'] and data['text']:
+                    result = mail_sender.send_mail(data)
+                    time.sleep(1)
+                    logger.error(result)
+                    STARTED = False
+                    return Response(status=200)
+                else:
+                    logger.error('Your mail-data is invalid!')
+                    STARTED = False
+                    return Response(status=400)
+    STARTED = False
 
 
 app = Flask(__name__)
