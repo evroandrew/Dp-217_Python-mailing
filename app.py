@@ -36,14 +36,14 @@ def consumer():
                 if data['mail'] and data['subject'] and data['text']:
                     result = mail_sender.send_mail(data)
                     time.sleep(1)
-                    logger.error(result)
+                    logger.info(result)
                     STARTED = False
                     return Response(status=200)
                 else:
                     logger.error('Your mail-data is invalid!')
                     STARTED = False
                     return Response(status=400)
-    STARTED = False
+        STARTED = False
 
 
 app = Flask(__name__)

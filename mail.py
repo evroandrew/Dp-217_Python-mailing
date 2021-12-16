@@ -9,8 +9,8 @@ from logs import logger
 class Mail:
     port = 465
     smtp_server_domain_name = 'smtp.gmail.com'
-    sender_mail = 'dp217py@gmail.com'
     sender_name = '"Enrollment_assistant"'
+    sender_mail = 'dp217py@gmail.com'
     password = os.environ.get('PASS_MAIL')
 
     def send_mail(self, data):
@@ -33,8 +33,8 @@ class Mail:
 
             mail.attach(text_content)
 
-            service.sendmail(self.sender_mail, self.email, mail.as_string())
-            report += f"Mail to {self.email} was sent.\n"
+            service.sendmail(self.sender_mail, email, mail.as_string())
+            report += f"Mail to {email} was sent.\n"
             logger.info(report)
             return report
 
